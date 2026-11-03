@@ -1,0 +1,27 @@
+name: Acceptance guard
+
+# tests/acceptance/ may change only in an [acceptance-test] PR, so the
+# Implement phase cannot edit the tests that define "done".
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # the PR merge commit and its base parent
+
+      - name: Block acceptance-test edits outside an [acceptance-test] PR
+        if: ${{ !startsWith(github.event.pull_request.title, '[acceptance-test]') }}
+        run: |
+          changed=$(git diff --name-only HEAD^1 HEAD -- tests/acceptance/)
+          if [ -n "$changed" ]; then
+            echo "::error::tests/acceptance/ may only change in an [acceptance-test] PR. Changed:"
+            echo "$changed"
+            exit 1
+          fi
+          echo "OK: tests/acceptance/ untouched"

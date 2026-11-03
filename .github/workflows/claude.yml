@@ -1,0 +1,37 @@
+name: Claude
+
+# "@claude ..." in an issue or PR comment. Used for the Maintenance phase,
+# e.g. "@claude /sdlc-maintain" on an issue, then "@claude /sdlc-<phase>" per step.
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  claude:
+    # Public repo: only the owner and collaborators may trigger Claude.
+    if: >-
+      contains(github.event.comment.body, '@claude') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history for git log / blame / bisect
+
+      # The Implement phase adds the toolchain setup step here (see sdlc-implement).
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # The Implement phase adds install/test commands to this list.
+          claude_args: |
+            --allowedTools "Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(git blame:*),Bash(git bisect:*)"
