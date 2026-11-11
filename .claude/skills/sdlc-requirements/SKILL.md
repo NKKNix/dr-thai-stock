@@ -46,6 +46,12 @@ Do not choose a data source, stack, or architecture. Formulas and business rules
 - For every AC, ask: "Could I write a failing test for this from the PRD alone?" Rewrite any AC that fails this.
 - Every in-scope story has at least one AC.
 - Nothing in the PRD names a technology unless the human required it.
+- Every threshold and time window has examples exactly at, just inside, and just outside each edge (e.g. a window's opening and closing minute, and any gap between windows).
+- Every interactive behaviour (sort, search, filter) states, for each column or field: the key it uses (raw vs. converted value, text vs. number vs. time), the tie-break, where empty values go, and how input is normalised (case, surrounding whitespace).
+- Every worked example is possible in the domain: timestamps fall inside the hours when that market or system actually operates, and dates fall on the stated weekdays. Check them with a script, not by eye.
+- When a parameter changes on an effective date, say which clock or calendar defines that date, and what happens to values that combine data from before and after the change.
+- Displayed times are pinned to a stated timezone, whatever the user's device is set to.
+- Every NFR states how it will be verified: an AC, a later phase's gate, or a measurement. If no acceptance test can cover it, say so.
 
 ## Step 4: Open the PR
 
